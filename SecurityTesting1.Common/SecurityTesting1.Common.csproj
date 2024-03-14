@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="protobuf-net" Version="3.2.30" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Company.DataAccess\Company.DataAccess.csproj" />
+    <ProjectReference Include="..\SecurityTesting1.Contracts\SecurityTesting1.Contracts.csproj" />
+    <ProjectReference Include="..\SecurityTesting1.DataAccess\SecurityTesting1.DataAccess.csproj" />
+    <ProjectReference Include="..\SecurityTesting1.DataTransfer\SecurityTesting1.DataTransfer.csproj" />
+  </ItemGroup>
+
+</Project>

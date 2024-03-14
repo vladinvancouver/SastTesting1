@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34024.191
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Trading.DataAccess", "Trading.DataAccess\Trading.DataAccess.csproj", "{A3000F19-2BF6-4FC8-B347-64D797083456}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Trading.DataAccess.Demo", "Trading.DataAccess.Demo\Trading.DataAccess.Demo.csproj", "{98A84C3B-EF1E-4FF7-A07E-C93AF6286F0F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A3000F19-2BF6-4FC8-B347-64D797083456}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A3000F19-2BF6-4FC8-B347-64D797083456}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A3000F19-2BF6-4FC8-B347-64D797083456}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A3000F19-2BF6-4FC8-B347-64D797083456}.Release|Any CPU.Build.0 = Release|Any CPU
+		{98A84C3B-EF1E-4FF7-A07E-C93AF6286F0F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{98A84C3B-EF1E-4FF7-A07E-C93AF6286F0F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{98A84C3B-EF1E-4FF7-A07E-C93AF6286F0F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{98A84C3B-EF1E-4FF7-A07E-C93AF6286F0F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2AFA3656-DDA4-4152-8443-CBB5EA979ED3}
+	EndGlobalSection
+EndGlobal

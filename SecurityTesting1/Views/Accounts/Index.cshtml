@@ -1,0 +1,379 @@
+﻿@{
+    ViewData["Title"] = "Accounts";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section scripts {
+    <script>
+        var pageUnloading = false;
+
+        $(window).bind('beforeunload', function () {
+            pageUnloading = true;
+        });
+
+        (function () {
+            $(document).on("click", '#buttonSave', function (event) {
+                formAccount_OnSave();
+            });
+
+            $(document).on("click", '#buttonDelete', function (event) {
+                $('#formAccount').modal('hide');
+                $('#formConfirmDelete').modal('show');
+            });
+
+            $(document).on("click", '#buttonConfirmDelete', function (event) {
+                formAccount_OnDelete();
+            });
+
+            $(document).on("click", '#buttonAdd', function (event) {
+                let account = { accountId: '00000000-0000-0000-0000-000000000000', accountName: '', description: '', isActive: true, userDefinedFields: {} };
+                populateFormAccount(account);
+
+                $('#formAccountTitle').text('New Account');
+                $('#buttonDelete').hide();
+                $('#formAccount').modal({backdrop: 'static'});
+                $('#formAccount').modal('show');
+            });
+        })();
+
+        $(window).on('load', function (e) {
+            start();
+
+            $('[data-toggle="tooltip"]').tooltip();
+        })
+
+        function start() {
+            $('#content').empty();
+            loadData();
+        }
+
+        function jwtRenewed() {
+
+        }
+
+        function loadData() {
+            getAccounts();
+        }
+
+        function getAccounts() {
+            $.ajax({
+                url: '@Url.Content("~/api/Accounts/GetAll")',
+                data: {
+
+                },
+                type: 'GET',
+                crossDomain: true,
+                dataType: 'json',
+                cache: false,
+                contentType: "application/json",
+                success: function (data) {
+                    renderAccounts(data);
+                },
+                complete: function (jqXHR, textStatus) {
+
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    if (pageUnloading || jqXHR.statusText == "abort") {
+                        return;
+                    }
+                    if (jqXHR.status === 400) {
+                        alert('Error: ' + jqXHR.responseText);
+                    } else if (jqXHR.status === 403) {
+                        alert('Access to API is denied. Please contact your system administrator.');
+                    } else {
+                        alert('Error sending data: ' + errorThrown);
+                    }
+                }
+            });
+        }
+
+        function addAccount(account) {
+            $('#buttonSave').attr('disabled', true);
+            $.ajax({
+                url: '@Url.Content("~/api/Accounts/Add")',
+                data: JSON.stringify(account),
+                type: 'POST',
+                crossDomain: true,
+                dataType: 'text',
+                cache: false,
+                contentType: "application/json",
+                success: function (data) {
+                    $('#formAccount').modal('hide');
+                    loadData();
+                },
+                complete: function (jqXHR, textStatus) {
+                    $('#buttonSave').removeAttr("disabled");
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    if (pageUnloading || jqXHR.statusText == 'abort') {
+                        return;
+                    }
+                    if (jqXHR.status === 400) {
+                        alert('Error: ' + jqXHR.responseText);
+                    } else if (jqXHR.status === 403) {
+                        alert('Access to API is denied. Please contact your system administrator.');
+                    } else {
+                        alert('Error sending data: ' + errorThrown);
+                    }
+                }
+            });
+        }
+
+        function updateAccount(account) {
+            $('#buttonSave').attr('disabled', true);
+            $('#buttonDelete').attr('disabled', true);
+            $.ajax({
+                url: '@Url.Content("~/api/Accounts/Update")',
+                data: JSON.stringify(account),
+                type: 'PUT',
+                crossDomain: true,
+                dataType: 'text',
+                cache: false,
+                contentType: "application/json",
+                success: function (data) {
+                    $('#formAccount').modal('hide');
+                    loadData();
+                },
+                complete: function (jqXHR, textStatus) {
+                    $('#buttonSave').removeAttr("disabled");
+                    $('#buttonDelete').removeAttr("disabled");
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    if (pageUnloading || jqXHR.statusText == 'abort') {
+                        return;
+                    }
+                    if (jqXHR.status === 400) {
+                        alert('Error: ' + jqXHR.responseText);
+                    } else if (jqXHR.status === 403) {
+                        alert('Access to API is denied. Please contact your system administrator.');
+                    } else {
+                        alert('Error sending data: ' + errorThrown);
+                    }
+                }
+            });
+        }
+
+        function renderAccounts(accounts) {
+            if (accounts == null)
+                return;
+
+            let $content = $('#content');
+            $content.empty();
+
+            if (accounts.length == 0) {
+                let $alert = $('<div class="alert alert-primary" role="alert">');
+                $alert.html('There are no accounts.')
+                $content.append($alert);
+                return;
+            }
+
+            let $table = $('<table id="accounts" class="table table-bordered">');
+            let $thead = $('<thead>');
+            let $headerRow = $('<tr>');
+            let $nameHeader = $('<th>');
+            $nameHeader.text('Name');
+            let $isActiveHeader = $('<th>');
+            $isActiveHeader.text('Is active');
+
+            let $tbody = $('<tbody>');
+            $headerRow.append($nameHeader);
+            $headerRow.append($isActiveHeader);
+            $thead.append($headerRow);
+            $table.append($thead);
+            $table.append($tbody);
+            $content.append($table)
+
+            renderRows(accounts);
+
+            $content.append('<p><small>Count: ' + accounts.length + '</small></p>');
+        }
+
+        function renderRows(accounts) {
+            if (accounts == null)
+                return;
+
+            for (let i = 0; i < accounts.length; i++) {
+                renderRow(accounts[i]);
+            }
+        }
+
+        function renderRow(account) {
+            let $newRow = $('<tr>');
+
+            let $cell1 = $('<td>');
+            let $hyperlink1 = $('<a href="#">');
+            $hyperlink1.text(account.accountName);
+            $hyperlink1.click(function () {
+                populateFormAccount(account);
+                $('#formAccountTitle').text('Edit Account');
+                $('#buttonDelete').show();
+                $('#formAccount').modal({backdrop: 'static'});
+                $('#formAccount').modal('show');
+            });
+            $cell1.append($hyperlink1);
+            $newRow.append($cell1);
+
+            let $cell2 = $('<td>');
+            if (account.isActive) {
+                $cell2.text('Yes');
+            } else {
+                $cell2.text('No');
+            }
+            $newRow.append($cell2);
+
+            $("#accounts > tbody:last-child").append($newRow);
+        }
+
+        function populateFormAccount(account) {
+            $('#hiddenId').val(account.accountId);
+            $('#textBoxAccountName').val(account.accountName);
+            $('#textBoxDescription').val(account.description);
+            $('#checkBoxIsActive').prop('checked', account.isActive);
+        }
+
+        function formAccount_OnSave() {
+            let accountId = $('#hiddenId').val().trim();
+            let accountName = $('#textBoxAccountName').val().trim();
+            let description = $('#textBoxDescription').val().trim();
+
+            if (accountName == '') {
+                alert('"Account name" cannot not be left blank.');
+                return;
+            }
+
+            if (accountName.length > 100) {
+                alert('"Account name" must not be longer than 100 characters.');
+                return;
+            }
+
+            if (description == '') {
+                alert('"Description" cannot not be left blank.');
+                return;
+            }
+
+            if (description.length > 100) {
+                alert('"Description" must not be longer than 100 characters.');
+                return;
+            }
+
+            let isActive = false;
+            if ($('#checkBoxIsActive').is(":checked"))
+            {
+                isActive = true;
+            }
+
+            let account = { accountId: accountId, accountName: accountName, description: description, isActive: isActive, userDefinedFields: {} };
+
+            if (accountId == '00000000-0000-0000-0000-000000000000') {
+                addAccount(account);
+            } else {
+                updateAccount(account);
+            }
+        }
+
+        function formAccount_OnDelete() {
+            let accountId = $('#hiddenId').val().trim();
+            deleteAccount(accountId);
+        }
+
+        function deleteAccount(accountId) {
+            $('#buttonSave').attr('disabled', true);
+            $('#buttonDelete').attr('disabled', true);
+            $('#buttonConfirmDelete').attr('disabled', true);
+            $.ajax({
+                url: '@Url.Content("~/api/Accounts/Delete")' + '?' + $.param({ accountId: accountId }),
+                data: {
+
+                },
+                type: 'DELETE',
+                crossDomain: true,
+                dataType: 'text',
+                cache: false,
+                contentType: "application/json",
+                success: function (data) {
+                    $('#formConfirmDelete').modal('hide');
+                    $('#formAccount').modal('hide');
+                    loadData();
+                },
+                complete: function (jqXHR, textStatus) {
+                    $('#buttonSave').removeAttr('disabled');
+                    $('#buttonDelete').removeAttr('disabled');
+                    $('#buttonConfirmDelete').removeAttr('disabled');
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    if (pageUnloading || jqXHR.statusText == 'abort') {
+                        return;
+                    }
+                    if (jqXHR.status === 400) {
+                        alert('Error: ' + jqXHR.responseText);
+                    } else if (jqXHR.status === 403) {
+                        alert('Access to API is denied. Please contact your system administrator.');
+                    } else {
+                        alert('Error sending data: ' + errorThrown);
+                    }
+                }
+            });
+        }
+    </script>
+}
+
+<ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="~/">Home</a></li>
+    <li class="breadcrumb-item active">Accounts</li>
+</ol>
+
+<p>
+    <button id="buttonAdd" type="button" class="btn btn-primary">Add...</button>
+</p>
+<div id="content"></div>
+
+<div id="formAccount" class="modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form>
+                <div class="modal-header">
+                    <h5 class="modal-title" id="formAccountTitle">Account</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="textBoxAccountName">Account name</label> <i class="far fa-question-circle" title="A unique name used to identity the account." data-toggle="tooltip"></i>
+                        <input type="text" class="form-control" id="textBoxAccountName">
+                    </div>
+                    <div class="mb-3">
+                        <label for="textBoxDescription">Description</label>
+                        <input type="text" class="form-control" id="textBoxDescription">
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="checkBoxIsActive">
+                        <label class="form-check-label" for="checkBoxIsActive">Is active</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <input type="hidden" id="hiddenId" value="">
+                    <button type="button" class="btn btn-primary" id="buttonSave">Save</button>
+                    <button type="button" class="btn btn-primary" style="display: none" id="buttonDelete">Delete...</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal" tabindex="-1" id="formConfirmDelete">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this account and associated data?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="buttonConfirmDelete">Yes, delete</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No, cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
