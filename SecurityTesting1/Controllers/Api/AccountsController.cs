@@ -53,6 +53,7 @@ namespace SecurityTesting1.Controllers.Api
 
 
         [Route("GetOrCreateAccount")]
+        [HttpGet]
         [HttpPost]
         public async Task<IActionResult> GetOrCreateAccountAsync([FromQuery] string accountName)
         {
