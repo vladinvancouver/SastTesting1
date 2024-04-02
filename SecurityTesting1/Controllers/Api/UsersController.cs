@@ -41,7 +41,7 @@ namespace SecurityTesting1.Controllers.Api
             {
                 _user = user;
 
-                Validate();
+                ValidateAsync();
 
                 return Ok();
             }
@@ -55,7 +55,7 @@ namespace SecurityTesting1.Controllers.Api
                 throw;
             }
         }
-        public async Task Validate()
+        public async Task ValidateAsync()
         {
             await Task.CompletedTask;
 
