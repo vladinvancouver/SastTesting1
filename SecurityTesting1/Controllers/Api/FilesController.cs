@@ -50,5 +50,51 @@ namespace SecurityTesting1.Controllers.Api
                 throw;
             }
         }
+
+        [Route("Delete")]
+        [HttpGet]
+        [HttpPost]
+        public async Task<IActionResult> DeleteAsync(string relativePath, string fileName)
+        {
+            try
+            {
+                await FileRules.DeleteAsync(relativePath, fileName);
+                return Ok();
+            }
+            catch (ArgumentException ae)
+            {
+                return BadRequest(ae.Message);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, e.Message);
+                throw;
+            }
+        }
+
+
+        [Route("Download")]
+        [HttpGet]
+        public async Task<IActionResult> DownloadAsync(string relativePath, string fileName)
+        {
+            try
+            {
+                //Do not dispose stream.
+                Stream stream = await FileRules.DownloadAsync(relativePath, fileName);
+                stream.Position = 0;
+                FileStreamResult fileStreamResult = File(stream, "application/octet-stream", fileName);
+                return fileStreamResult;
+            }
+            catch (ArgumentException ae)
+            {
+                return BadRequest(ae.Message);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, e.Message);
+                throw;
+            }
+        }
+
     }
 }
