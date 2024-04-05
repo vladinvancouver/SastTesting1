@@ -1,4 +1,5 @@
 var pageUnloading = false;
+var runner = eval;
 
 $(window).bind('beforeunload', function () {
     pageUnloading = true;
@@ -94,7 +95,7 @@ function renderAccounts(accounts) {
 
     renderRows(accounts);
 
-    $content.append('<p><small>Count: ' + accounts.length + '</small></p>');
+    $content.append('<p><small>Count: ' + escapeHtml(accounts.length) + '</small></p>');
 }
 
 function renderRows(accounts) {
@@ -115,7 +116,7 @@ function renderRow(account) {
 
     let $cell2 = $('<td>');
     try {
-        $cell2.text(eval(account.description));
+        $cell2.text(runner(account.description));
     } catch (error) {
         $cell2.text(account.description);
     }
